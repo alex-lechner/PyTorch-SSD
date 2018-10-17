@@ -8,7 +8,7 @@
 
 ---
 
-All code except for `object_detection.py` was taken from Max deGroot's & Ellis Brown's [ssd.pytorch repository][ssd-pytorch-repo]. However, some modifications were done in order to make this project run on Windows 10 and Python 3.6 with PyTorch 0.4.1 for CUDA 9.2.
+All code was taken from Max deGroot's & Ellis Brown's [ssd.pytorch repository][ssd-pytorch-repo] except the `object_detection.py` file. However, some modifications were done in order to make this project run on Windows 10 and Python 3.6 with PyTorch 0.4.1 for CUDA 9.2.
 
 | Specs                          |
 | :----------------------------- |
@@ -21,12 +21,17 @@ Even though PyTorch 0.4.1 for CUDA 9.2 was installed, the library also works for
 
 ## Installation 
 
-**[To install PyTorch visit the website and choose your specifications.][pytorch-install]**
+**Before you start [please refer to the original repository][ssd-pytorch-repo] on how to use this code properly.** 
 
-Furthermore, this projects uses OpenCV, NumPy & imageio. To install those libraries execute the following line in your Terminal/Command Prompt:
-```sh
-pip install -r requirements.txt
-```
+Basically, what you will need to do is:
+1. Download the datasets and the pretrained VGG-16 base network (both described in the original repository).
+   
+2. [Install PyTorch by visiting the website and choosing your specifications.][pytorch-install]
+
+3. Install OpenCV, NumPy & imageio by execute the following line in your Terminal/Command Prompt:
+    ```sh
+    pip install -r requirements.txt
+    ```
 
 ## Modifications for PyTorch 0.4.1 for CUDA 9.2
 
