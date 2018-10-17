@@ -1,0 +1,62 @@
+## PyTorch-SSD
+
+[//]: # (References)
+[ssd-pytorch-repo]: https://github.com/amdegroot/ssd.pytorch
+[cudnn]: https://developer.nvidia.com/cudnn
+[cuda]: https://developer.nvidia.com/cuda-downloads
+[pytorch-install]: https://pytorch.org/
+
+---
+
+All code except for `object_detection.py` was taken from Max deGroot's & Ellis Brown's [ssd.pytorch repository][ssd-pytorch-repo]. However, some modifications were done in order to make this project run on Windows 10 and Python 3.6 with PyTorch 0.4.1 for CUDA 9.2.
+
+| Specs                          |
+| :----------------------------- |
+| Windows 10                     |
+| NVIDIA GeForce GTX 850M        |
+| [CUDA 10.0 (Download)][cuda]   |
+| [cuDNN 10.0 (Download)][cudnn] |
+
+Even though PyTorch 0.4.1 for CUDA 9.2 was installed, the library also works for CUDA 10.0.
+
+## Installation 
+
+**[To install PyTorch visit the website and choose your specifications.][pytorch-install]**
+
+Furthermore, this projects uses OpenCV, NumPy & imageio. To install those libraries execute the following line in your Terminal/Command Prompt:
+```sh
+pip install -r requirements.txt
+```
+
+## Modifications for PyTorch 0.4.1 for CUDA 9.2
+
+The following modifications has been made to successfully execute `train.py`:
+
+In `layers/modules/multibox_loss.py` add `loss_c = loss_c.view(pos.size()[0], pos.size()[1])` on line 97 like so:
+```python
+# Hard Negative Mining
+loss_c = loss_c.view(pos.size()[0], pos.size()[1])
+loss_c[pos] = 0  # filter out pos boxes for now
+loss_c = loss_c.view(num, -1)
+```
+and then change `N = num_pos.data.sum()` to `N = num_pos.data.sum().float()` on line 115.
+
+## Training
+
+If you are training on a Windows machine make sure to set the value of the `--num_workers` flag to `0` or you will get a `BrokenPipeError: [Errno 32] Broken pipe` error. On my machine, I also need to close all programs (except the Command Prompt of course) and set the batch size to 2 as well as the learning rate to 0.000006 in order to train the model otherwise I get a `RuntimeError: CUDA error: out of memory` error.
+
+```sh
+python train.py --num_workers 0 --batch_size 2 --lr 1e-6
+```
+
+TODO: train on EC2 instance with a DLAMI
+
+## Detection in a video
+
+After you have trained the SSD model and you want to detect objects in a video execute the following line in your Terminal/Command Prompt.
+
+```python
+python object_detection.py path_to/your_ssd_model.pth path_to/your_video.mp4 -o path_to/name_of_your_output_video.mp4
+```
+
+If the `-o` flag is not specified the output video will simply have the name `output.mp4`
