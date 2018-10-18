@@ -1,4 +1,4 @@
-## PyTorch-SSD
+# PyTorch-SSD
 
 [//]: # (References)
 [ssd-pytorch-repo]: https://github.com/amdegroot/ssd.pytorch
@@ -11,6 +11,10 @@
 [aws-spot-instance]: ./imgs/aws-dlami-pytorch.jpg
 [activate-pytorch-env]: ./imgs/activate-pytorch-env.jpg
 [installation]: #installation
+[anaconda-dist]: https://www.anaconda.com/download/
+[my-ssd]: https://ln.sync.com/dl/74a3bbef0/8njcymdw-wm37r4u9-idyfiu3c-8uu2y2ss
+[horse-detection]: ./videos/epic-horses-detected.mp4
+[dog-detection]: ./videos/funny_dog-detected.mp4
 
 ---
 
@@ -120,9 +124,19 @@ Lastly, clone this repository, [proceed with the installation process][installat
 ```sh
 ## you probably don't need to add any arguments here
 python train.py
-``` 
+```
+
+If you don't want to train an SSD model and want to try the detection only you can [download my trained SSD model][my-ssd]. I've trained the model with all default values/parameters from the original repository but stopped the training after 1500 iterations because the loss stagnated.
 
 ## Detection in a video
+
+To detect objects in a video you first need to install `ffmpeg` by executing the following line:
+```sh
+conda install ffmpeg -c conda-forge
+```
+
+Note: This command only works if you have the [Anaconda Distribution][anaconda-dist] installed on your computer.
+
 
 After you have trained the SSD model and you want to detect objects in a video execute the following line in your Terminal/Command Prompt.
 
@@ -131,3 +145,7 @@ python object_detection.py path_to/your_ssd_model.pth path_to/your_video.mp4 -o 
 ```
 
 If the `-o` flag is not specified the output video will simply have the name `output.mp4`
+
+You can watch sample outputs from here:
+* [Horse detection][horse-detection]
+* [Person & dog detection][dog-detection]
