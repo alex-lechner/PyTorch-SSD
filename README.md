@@ -6,12 +6,17 @@
 [cuda]: https://developer.nvidia.com/cuda-downloads
 [pytorch-install]: https://pytorch.org/
 [stopiteration-fix]: https://github.com/amdegroot/ssd.pytorch/issues/214#issuecomment-409851395
+[aws-login]: https://console.aws.amazon.com/
+[aws-dlami-guide]: https://docs.aws.amazon.com/dlami/latest/devguide/what-is-dlami.html
+[aws-spot-instance]: ./imgs/aws-dlami-pytorch.jpg
+[activate-pytorch-env]: ./imgs/activate-pytorch-env.jpg
+[installation]: #installation
 
 ---
 
 All code was taken from Max deGroot's & Ellis Brown's [ssd.pytorch repository][ssd-pytorch-repo] except the `object_detection.py` file. However, some modifications were done in order to make this project run on Windows 10 and Python 3.6 with PyTorch 0.4.1 for CUDA 9.2.
 
-| Specs                          |
+| Local Machine Specs            |
 | :----------------------------- |
 | Windows 10                     |
 | NVIDIA GeForce GTX 850M        |
@@ -29,7 +34,7 @@ Basically, what you will need to do is:
    
 2. [Install PyTorch by visiting the website and choosing your specifications.][pytorch-install]
 
-3. Install OpenCV, NumPy & imageio by execute the following line in your Terminal/Command Prompt:
+3. Install OpenCV, NumPy & imageio by executing the following line in your Terminal/Command Prompt:
     ```sh
     pip install -r requirements.txt
     ```
@@ -76,13 +81,46 @@ if scores.size(0) == 0:
 
 ## Training
 
+### Local machine
 If you are training on a Windows machine make sure to set the value of the `--num_workers` flag to `0` or you will get a `BrokenPipeError: [Errno 32] Broken pipe` error. On my machine, I also need to close all programs (except the Command Prompt of course) and set the batch size to 2 as well as the learning rate to 0.000006 in order to train the model otherwise I get a `RuntimeError: CUDA error: out of memory` error.
 
 ```sh
 python train.py --num_workers 0 --batch_size 2 --lr 1e-6
 ```
 
-TODO: train on EC2 instance with Deep Learning AMI (Ubuntu) Version 14.0
+### AWS spot instance
+Since training on my local machine with the settings/flags above would take days (or even weeks) to get reasonable results I decided to train the SSD on an AWS spot instance.
+
+To set up an AWS spot instance do the following steps:
+
+1. [Login to your Amazon AWS Account][aws-login]
+2. Navigate to **EC2 > Instances > Spot Requests > Request Spot Instances**
+3. Under `AMI` click on `Search for AMI`, type `AWS Deep Learning AMI` in the search field, choose `Community AMIs` from the drop-down and select the `Deep Learning AMI (Ubuntu) Version 14.0`
+3. Delete the default instance type, click on Select and select the p2.xlarge instance
+4. Uncheck the `Delete` checkbox under EBS Volumes so your progress is not deleted when the instance gets terminated
+5. Set Security Groups to default
+6. Select your key pair under Key pair name (if you don't have one create a new key pair)
+7. At the very bottom set `Request valid until` to about 10 - 12 hours and set `Terminate instances at expiration` as checked (You don't have to do this but keep in mind to receive a very large bill from AWS if you forget to terminate your spot instance because the default value for termination is set to 1 year.)
+8. Click `Launch`, wait until the instance is created and then connect to your instance via ssh
+
+There's also a detailed explanation from AWS about [AWS Deep Learning AMIs][aws-dlami-guide]. You might give it a shot as well.
+
+![aws-spot-instance][aws-spot-instance]
+_Spot instance setup_
+
+When your spot instance is up and running AND you have connected to your spot instance you then need to activate the PyTorch environment like so:
+```sh
+source activate pytorch_p36
+```
+
+![activate-pytorch-env][activate-pytorch-env]
+*Activate PyTorch environment on spot instance*
+
+Lastly, clone this repository, [proceed with the installation process][installation] (except for PyTorch) and start training by executing: 
+```sh
+## you probably don't need to add any arguments here
+python train.py
+``` 
 
 ## Detection in a video
 
