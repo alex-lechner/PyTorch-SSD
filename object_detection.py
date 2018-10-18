@@ -84,7 +84,7 @@ def main(args):
                         '.mpeg', '.mp4', '.mkv', '.wmv')
     if args.output and args.output.lower().endswith(possible_formats):
         output_name = args.output
-    
+
     store_path = os.path.join(output_dir, output_name)
     ## Create the transformation
     transform = BaseTransform(

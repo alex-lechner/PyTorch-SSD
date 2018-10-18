@@ -63,6 +63,17 @@ loss_c = loss_c.view(num, -1)
 ```
 and then change `N = num_pos.data.sum()` to `N = num_pos.data.sum().float()` on line 115.
 
+In `layers/functions/detection.py` line 62 was changed from:
+```python
+if scores.dim() == 0:
+    continue
+```
+to:
+```python
+if scores.size(0) == 0:
+    continue
+```
+
 ## Training
 
 If you are training on a Windows machine make sure to set the value of the `--num_workers` flag to `0` or you will get a `BrokenPipeError: [Errno 32] Broken pipe` error. On my machine, I also need to close all programs (except the Command Prompt of course) and set the batch size to 2 as well as the learning rate to 0.000006 in order to train the model otherwise I get a `RuntimeError: CUDA error: out of memory` error.
