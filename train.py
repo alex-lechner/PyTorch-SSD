@@ -19,6 +19,7 @@ import argparse
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
+
 def args_parser():
     parser = argparse.ArgumentParser(
         description='Single Shot MultiBox Detector Training With Pytorch')
@@ -53,20 +54,20 @@ def args_parser():
                         help='Directory for saving checkpoint models')
     return parser.parse_args()
 
+
 def init_torch(args):
     if torch.cuda.is_available():
         if args.cuda:
             torch.set_default_tensor_type('torch.cuda.FloatTensor')
         if not args.cuda:
             print("WARNING: It looks like you have a CUDA device, but aren't " +
-                "using CUDA.\nRun with --cuda for optimal training speed.")
+                  "using CUDA.\nRun with --cuda for optimal training speed.")
             torch.set_default_tensor_type('torch.FloatTensor')
     else:
         torch.set_default_tensor_type('torch.FloatTensor')
 
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)
-
 
 
 def create_vis_plot(viz, _xlabel, _ylabel, _title, _legend):
@@ -81,11 +82,13 @@ def create_vis_plot(viz, _xlabel, _ylabel, _title, _legend):
         )
     )
 
+
 def update_vis_plot(viz, iteration, loc, conf, window1, window2, update_type,
                     epoch_size=1):
     viz.line(
         X=torch.ones((1, 3)).cpu() * iteration,
-        Y=torch.Tensor([loc, conf, loc + conf]).unsqueeze(0).cpu() / epoch_size,
+        Y=torch.Tensor([loc, conf, loc + conf]
+                       ).unsqueeze(0).cpu() / epoch_size,
         win=window1,
         update=update_type
     )
@@ -172,8 +175,10 @@ def train(args):
     if args.visdom:
         vis_title = 'SSD.PyTorch on ' + dataset.name
         vis_legend = ['Loc Loss', 'Conf Loss', 'Total Loss']
-        iter_plot = create_vis_plot(viz, 'Iteration', 'Loss', vis_title, vis_legend)
-        epoch_plot = create_vis_plot(viz, 'Epoch', 'Loss', vis_title, vis_legend)
+        iter_plot = create_vis_plot(
+            viz, 'Iteration', 'Loss', vis_title, vis_legend)
+        epoch_plot = create_vis_plot(
+            viz, 'Epoch', 'Loss', vis_title, vis_legend)
 
     data_loader = data.DataLoader(dataset, args.batch_size,
                                   num_workers=args.num_workers,
@@ -195,7 +200,11 @@ def train(args):
             adjust_learning_rate(optimizer, args.gamma, step_index, args.lr)
 
         # load train data
-        images, targets = next(batch_iterator)
+        try:
+            images, targets = next(batch_iterator)
+        except StopIteration:
+            batch_iterator = iter(data_loader)
+            images, targets = next(batch_iterator)
 
         if args.cuda:
             images = Variable(images.cuda())
@@ -218,7 +227,8 @@ def train(args):
 
         if iteration % 10 == 0:
             print('timer: %.4f sec.' % (t1 - t0))
-            print('iter ' + repr(iteration) + ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
+            print('iter ' + repr(iteration) + ' || Loss: %.4f ||' %
+                  (loss.data[0]), end=' ')
 
         if args.visdom:
             update_vis_plot(viz, iteration, loss_l.data[0], loss_c.data[0],
@@ -251,8 +261,6 @@ def weights_init(m):
     if isinstance(m, nn.Conv2d):
         xavier(m.weight.data)
         m.bias.data.zero_()
-
-
 
 
 if __name__ == '__main__':

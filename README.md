@@ -5,6 +5,7 @@
 [cudnn]: https://developer.nvidia.com/cudnn
 [cuda]: https://developer.nvidia.com/cuda-downloads
 [pytorch-install]: https://pytorch.org/
+[stopiteration-fix]: https://github.com/amdegroot/ssd.pytorch/issues/214#issuecomment-409851395
 
 ---
 
@@ -37,6 +38,20 @@ Basically, what you will need to do is:
 
 The following modifications has been made to successfully execute `train.py`:
 
+In `train.py` line 203 (line 165 in the original repo) was changed from:
+```python
+images, targets = next(batch_iterator)
+```
+to:
+```python
+try:
+    images, targets = next(batch_iterator)
+except StopIteration:
+    batch_iterator = iter(data_loader)
+    images, targets = next(batch_iterator)
+```
+The fix was copied from [this comment][stopiteration-fix]. 
+
 In `layers/modules/multibox_loss.py` add `loss_c = loss_c.view(pos.size()[0], pos.size()[1])` on line 97 like so:
 ```python
 # Hard Negative Mining
@@ -54,7 +69,7 @@ If you are training on a Windows machine make sure to set the value of the `--nu
 python train.py --num_workers 0 --batch_size 2 --lr 1e-6
 ```
 
-TODO: train on EC2 instance with a DLAMI
+TODO: train on EC2 instance with Deep Learning AMI (Ubuntu) Version 14.0
 
 ## Detection in a video
 
