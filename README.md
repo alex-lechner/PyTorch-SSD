@@ -52,6 +52,8 @@ except StopIteration:
 ```
 The fix was copied from [this comment][stopiteration-fix]. 
 
+Fixed naming of the saved model in `train.py` on line 239 & 244 (line 196 & 198).
+
 In `layers/modules/multibox_loss.py` add `loss_c = loss_c.view(pos.size()[0], pos.size()[1])` on line 97 like so:
 ```python
 # Hard Negative Mining
