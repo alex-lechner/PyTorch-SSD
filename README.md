@@ -141,7 +141,7 @@ Note: This command only works if you have the [Anaconda Distribution][anaconda-d
 After you have trained the SSD model and you want to detect objects in a video execute the following line in your Terminal/Command Prompt.
 
 ```python
-python object_detection.py path_to/your_ssd_model.pth path_to/your_video.mp4 -o path_to/name_of_your_output_video.mp4
+python object_detection.py path_to/your_ssd_model.pth path_to/your_video.mp4 -o name_of_your_output_video.mp4
 ```
 
 If the `-o` flag is not specified the output video will simply have the name `output.mp4`
